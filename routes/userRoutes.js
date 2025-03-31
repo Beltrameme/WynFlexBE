@@ -8,6 +8,6 @@ module.exports = (app, upload) => {
     // DELETE -> ELIMINAR DATOS
 
     app.get('/api/users/find', usersController.findById);
-    
+    app.post('/api/users/login', usersController.login)
 
 }
