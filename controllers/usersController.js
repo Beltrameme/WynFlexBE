@@ -44,15 +44,16 @@ module.exports = {
                     message: 'Email no encontrado'
                 })
             }
+            //comentado porque todavia no esta la encriptacion de la password
+            /*const isPasswordValid = await bcrypt.compare(password, myUser.password)*/
 
-            const isPasswordValid = await bcrypt.compare(password, myUser.password)
-
-            if(isPasswordValid){
+            if(/*isPasswordValid*/ password == myUser.password){
                 const token = jwt.sign({id: myUser.id, email: myUser.email}, keys.secretOrKey, {})
 
                 const data = {
                     id: `${myUser.id}`,
-                    rol: myUser.rol
+                    rol: myUser.rol,
+                    session_token: `JWT ${token}`
                 }
                 return res.status(201).json({
                     success: true,
@@ -61,11 +62,64 @@ module.exports = {
                 })
             }
             else {
-                return res.status(401).json({ // EL CLIENTE NO TIENE AUTORIZACION PARTA REALIZAR ESTA PETICION (401)
+                return res.status(401).json({
                     success: false,
                     message: 'El password es incorrecto'
                 });
             }
         })
+    },
+    getUser(req,res){
+        try {
+            //enviar la data en el header con authorization como "bearer [token]"
+            const authHeader = req.headers.authorization;
+
+            if (!authHeader || !authHeader.startsWith('Bearer ')) {
+                return res.status(401).json({
+                    success: false,
+                    message: 'Authorization header missing or invalid'
+                });
+            }
+
+            const token = authHeader.split(' ')[1];
+            
+            if (!token) {
+                return res.status(401).json({
+                    success: false,
+                    message: 'No se envio un token'
+                });
+            }
+    
+            const decoded = jwt.verify(token, keys.secretOrKey);
+            
+            const userData = {
+                id: decoded.id,
+                email: decoded.email,
+                rol: decoded.rol
+            };
+    
+            return res.status(200).json({
+                success: true,
+                message: 'User Encontrado',
+                user: userData
+            });
+    
+        } catch (error) {
+            console.log("error");
+            console.log(error);
+            
+            
+            let message = 'Fallo al autenticar usuario';
+            if (error instanceof jwt.JsonWebTokenError) {
+                message = 'Token invalido';
+            } else if (error instanceof jwt.TokenExpiredError) {
+                message = 'Token expirado';
+            }
+    
+            return res.status(401).json({
+                success: false,
+                message: message
+            });
+        }  
     }
 }
