@@ -71,10 +71,10 @@ module.exports = {
     },
     getUser(req,res){
         try {
-            //enviar la data en el header con authorization como "bearer [token]"
+            //enviar la data en el header con authorization como "jwt [token]"
             const authHeader = req.headers.authorization;
 
-            if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            if (!authHeader || !authHeader.startsWith('jwt ')) {
                 return res.status(401).json({
                     success: false,
                     message: 'Authorization header missing or invalid'
