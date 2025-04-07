@@ -10,5 +10,5 @@ module.exports = (app, upload) => {
     app.get('/api/users/find', usersController.findById);
     app.post('/api/users/login', usersController.login);
     app.get('/api/users/me',passport.authenticate('jwt', {session:false}), usersController.getUser)
-
+    app.post('/api/users/register', usersController.register)
 }
