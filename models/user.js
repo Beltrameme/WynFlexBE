@@ -96,4 +96,82 @@ User.create = async (user,result) => {
     )
 }
 
+User.getAll = async (result) => {
+    const sql = `
+    SELECT * FROM users
+    `
+    db.query(
+        sql,
+        (err, res) => {
+            if (err) {
+                console.log('Error:', err);
+                result(err, null);
+            }
+            else {
+                console.log('todos los users:', res);
+                result(null, res);
+            }
+        }
+    )
+}
+
+User.delete = (id, result) => {
+    const sql = `
+    DELETE FROM
+        users
+    WHERE
+        id = ?
+    `;
+    db.query(
+        sql,
+        id,
+        (err, res) => {
+            if (err) {
+                console.log('Error:', err);
+                result(err, null);
+            }
+            else {
+                console.log('Id usuario eliminado:', id);
+                result(null, id);
+            }
+        }
+    )
+}
+
+User.update = async (user, result) => {
+    const hash = await bcrypt.hash(user.password, 10);
+    const sql = `
+    UPDATE
+        users
+    SET
+        email = ?,
+        password = ?,
+        rol = ?,
+        updated_at = ?
+    WHERE
+        id = ?
+    `;
+    db.query
+    (
+        sql,
+        [
+            user.email,
+            hash,
+            user.rol,
+            new Date(),
+            user.id
+        ],
+        (err, res) => {
+            if (err) {
+                console.log('Error:', err);
+                result(err, null);
+            }
+            else {
+                console.log('Usuario Actualizado:', res.insertId);
+                result(null, user.id);
+            }
+        }
+    )
+}
+
 module.exports = User
