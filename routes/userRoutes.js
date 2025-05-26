@@ -9,6 +9,11 @@ module.exports = (app, upload) => {
 
     app.get('/api/users/find', usersController.findById);
     app.post('/api/users/login', usersController.login);
-    app.get('/api/users/me', usersController.getUser)
+    app.get('/api/users/me',passport.authenticate('jwt', {session:false}), usersController.getUser)
+    app.post('/api/users/register', usersController.register)
+    app.get('/api/users/getall', usersController.getAll)
+    app.delete('/api/users/delete/:id',passport.authenticate('jwt', {session:false}), usersController.delete);
+    app.put('/api/users/update',passport.authenticate('jwt', {session:false}), usersController.update);
+    app.post('/api/users/recovery', usersController.recovery)
 
-}
+}   
