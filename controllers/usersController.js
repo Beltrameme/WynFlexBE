@@ -2,6 +2,7 @@ const User = require('../models/user');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const keys = require('../config/keys');
+const nodemailer = require('nodemailer');
 
 module.exports = {
     findById(req,res) {
@@ -196,5 +197,55 @@ module.exports = {
             
 
         }); 
+    },
+    recovery(req,res){
+        const email = req.body.email
+        console.log(email);
+        
+
+        User.findByEmail(email, (err,data) => {
+            if (err) {
+                return res.status(501).json({
+                    success: false,
+                    message: 'No se encontro al usuario',
+                    error: err
+                });
+            }
+            else{
+                try {
+                    const transporter = nodemailer.createTransport({
+                        service: 'gmail',
+                        auth: {
+                            user: 'beltrameme@gmail.com', // Your email
+                            pass: 'zsxozpirfadantqe' // Your password or app password
+                        }
+                    });
+            
+                    // Email content
+                    const mailOptions = {
+                        from: 'beltrameme@gmail.com',
+                        to: email,
+                        subject: 'Contraseña',
+                        text: `aca te va: ${data.password}\n\nno la compartas.`
+                    };
+            
+                    // Send email
+                    transporter.sendMail(mailOptions);
+                    
+                    return res.status(201).json({
+                        success: true,
+                        message: 'La password se envio al email',
+                    })
+                } catch (error) {
+                    console.log(error);
+                    
+                    return res.status(500).json({
+                        success: false,
+                        message: 'error inesperado',
+                        error: error
+                    });
+                }
+            }
+        })
     }
 }

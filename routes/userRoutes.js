@@ -14,5 +14,6 @@ module.exports = (app, upload) => {
     app.get('/api/users/getall', usersController.getAll)
     app.delete('/api/users/delete/:id',passport.authenticate('jwt', {session:false}), usersController.delete);
     app.put('/api/users/update',passport.authenticate('jwt', {session:false}), usersController.update);
+    app.post('/api/users/recovery', usersController.recovery)
 
 }   
